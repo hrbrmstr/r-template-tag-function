@@ -64,7 +64,7 @@ h2 {
 }
 
 pre {
-	font-size: 24px/32px;
+	font-size: calc(var(--body-1) * 10);
 }
 
 pre,
@@ -73,6 +73,7 @@ code {
 }
 
 pre.shiki {
+	font-size: calc(var(--body-1) * 10);
 	border: 1px solid gray;
 	overflow-x: auto;
 	overflow-y: scroll;
