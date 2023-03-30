@@ -26,6 +26,7 @@ export default [
 			copy({
 				targets: [
 					{ src: '*.map', dest: 'build' }
+					{ src: '*.png', dest: 'build' }
 				]
 			})
 		]
