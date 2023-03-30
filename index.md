@@ -50,10 +50,10 @@ I added also a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/
 
 ```js
 await R`sample(100, 5)`
-```
+``` 
 
 <p>and it'll "<code>evalR</code>" and "<code>toJs</code>" the code between the template string.</p>
 
 <p>Copy that to the clipboard, open DevTools and try it!</p>
 
-<p><a href="https://github.com/hrbrmstr/slightly-more-than-minimal/tree/batman">Get it on GitHub</a>.</p>
+<p><a href="https://github.com/hrbrmstr/webr-pyodide-minimal-plus-markdown">Get it on GitHub</a>.</p>
