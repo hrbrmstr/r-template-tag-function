@@ -7,6 +7,8 @@
     "description": "More straightforward way to call R code with some deliberate limitations.",
     "image": {
       "url": "https://rud.is/w/r-template-tag-function/preview.png",
+      "height": "836",
+      "width": "1014",
       "alt": "example"
     }
   },
