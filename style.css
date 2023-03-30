@@ -64,7 +64,7 @@ h2 {
 }
 
 pre {
-	font-size: calc(var(--body-2) * 10);
+	font-size: calc(var(--body-1) * 10);
 }
 
 pre,
