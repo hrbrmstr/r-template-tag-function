@@ -69,6 +69,16 @@ code {
 	font-size: var(--body-2);
 }
 
+pre {
+	border: 1px solid gray;
+	overflow: autos;
+	overflow-y: scroll;
+	padding: 2rem;
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+	white-space: pre-wrap;
+}
+
 a {
 	color: rgba(var(--functional-yellow), 1)
 }
