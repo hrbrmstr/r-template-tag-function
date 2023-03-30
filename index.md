@@ -48,9 +48,9 @@
 
 I added also a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates">Tag Function</a> so you can do:
 
-<pre class="text-output">
+```js
 await R`sample(100, 5)`
-</pre>
+```
 
 <p>and it'll "<code>evalR</code>" and "<code>toJs</code>" the code between the template string.</p>
 
