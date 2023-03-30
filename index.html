@@ -15,7 +15,7 @@
 <meta property="twitter:site_name" content="@hrbrmstr">
 <meta property="twitter:domain" content="rud.is">
 <meta property="twitter:card" content="summary_large_image">
-<meta property="article:published_time" content="2023-03-30T13:14:23.893Z">
+<meta property="article:published_time" content="2023-03-30T14:28:09.283Z">
 <link rel='apple-touch-icon' sizes='180x180' href='./favicon/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='./favicon/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='./favicon/favicon-16x16.png'>
@@ -38,12 +38,58 @@
 <button id="rpy-button" disabled>Get some random numbers from R that uses an array supplied by Python</button>
 <pre class="text-output" id="rpy-output">&nbsp;</pre>
 </div>
-<p>I added also a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates">Tag Function</a> so you can do:</p>
+<h2>Another WebR Experiment? <em>Really</em>?</h2>
+<p>Yep!</p>
+<p>There's some good stuff under the covers here.</p>
+<p>First, you'll notice the page loaded pretty fast. That's b/c I moved the Markdown→HTML rendering offline via a hacky JS script I wrote. Rendering Markdown on the fly is cool and all, but it's not needed.</p>
+<p>And, yes, you've seen Pyodide &amp; WebR working together from me before (like, yesterday), but today we have some plumbing to look at since I also added a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates">Tag Function</a> so you can do:</p>
 <pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">R</span><span style="color: #AAD94C">`sample(100, 5)`</span></span>
 <span class="line"></span></code></pre>
-<p>and it'll "<code>evalR</code>" and "<code>toJs</code>" the code between the template string.</p>
-<p>Copy that to the clipboard, open DevTools and try it!</p>
-<p><a href="https://github.com/hrbrmstr/webr-pyodide-minimal-plus-markdown">Get it on GitHub</a>.</p>
+<p>and it'll &quot;<code>evalR</code>&quot; and &quot;<code>toJs</code>&quot; the code between the template string (plus some other stuff we'll see below).</p>
+<p>First, copy that to the clipboard, open DevTools and try it!</p>
+<h2>Buttoning Thing Up</h2>
+<p>The code behind &quot;Button #1&quot; is:</p>
+<pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> rButton </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> document</span><span style="color: #F29668">.</span><span style="color: #FFB454">getElementById</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">&quot;r-button&quot;</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">rButton</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">disabled </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> </span><span style="color: #D2A6FF">false</span></span>
+<span class="line"><span style="color: #BFBDB6">rButton</span><span style="color: #F29668">.</span><span style="color: #FFB454">onclick</span><span style="color: #BFBDB6"> </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> </span><span style="color: #FF8F40">async</span><span style="color: #BFBDB6"> () </span><span style="color: #FF8F40">=&gt;</span><span style="color: #BFBDB6"> {</span></span>
+<span class="line"><span style="color: #BFBDB6">  </span><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> output </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> document</span><span style="color: #F29668">.</span><span style="color: #FFB454">getElementById</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">&quot;r-output&quot;</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">  output</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">innerText </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> JSON</span><span style="color: #F29668">.</span><span style="color: #FFB454">stringify</span><span style="color: #BFBDB6">(</span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">R</span><span style="color: #AAD94C">`sample(100, 5)`</span><span style="color: #BFBDB6">) </span><span style="color: #ACB6BF8C; font-style: italic">// what is this magic?</span></span>
+<span class="line"><span style="color: #BFBDB6">}</span><span style="color: #BFBDB6B3">;</span></span>
+<span class="line"></span></code></pre>
+<p>Thanks to that template function, the second to last line is very compact. The template/tag function applies some basic heuristics to determine whether it can return a &quot;simple&quot; type. If it can, it'll do all the work for you. I'll eventually get it to handle more complex return types (i.e. the horrible mess that is the WebR <code>toJs()</code> return value for a <code>data.frame</code>).</p>
+<p>This <code>R</code> template function is not meant to take the place of <code>evalR…()</code>. Trying to shove too much functionality into a shortcut operation like this is fraught with peril. Plus, there are limitations.</p>
+<p>To provide for a more complex situation, like when we want to pass in <a href="https://docs.r-wasm.org/webr/latest/api/js/interfaces/WebRChan.EvalROptions.html"><code>REvalOptions</code></a> to <code>evalR…()</code> we had to dedicate the use of <code>${}</code> to just letting you (optionally) pass in an <code>REvalOptions</code> structure, so no interpolation for you!</p>
+<p>Let's take a look at &quot;Button #3&quot; to see what that looks like:</p>
+<pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> rpyButton </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> document</span><span style="color: #F29668">.</span><span style="color: #FFB454">getElementById</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">&quot;rpy-button&quot;</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">rpyButton</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">disabled </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> </span><span style="color: #D2A6FF">false</span></span>
+<span class="line"><span style="color: #BFBDB6">rpyButton</span><span style="color: #F29668">.</span><span style="color: #FFB454">onclick</span><span style="color: #BFBDB6"> </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> </span><span style="color: #FF8F40">async</span><span style="color: #BFBDB6"> () </span><span style="color: #FF8F40">=&gt;</span><span style="color: #BFBDB6"> {</span></span>
+<span class="line"><span style="color: #BFBDB6">  </span><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> output </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> document</span><span style="color: #F29668">.</span><span style="color: #FFB454">getElementById</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">&quot;rpy-output&quot;</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">  </span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> webPy</span><span style="color: #F29668">.</span><span style="color: #FFB454">runPython</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">`pyRange = list(range(1, 101))`</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">  </span><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> opts </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> {</span></span>
+<span class="line"><span style="color: #BFBDB6">    env</span><span style="color: #BFBDB6B3">:</span><span style="color: #BFBDB6"> { pyRange</span><span style="color: #BFBDB6B3">:</span><span style="color: #BFBDB6"> webPy</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">globals</span><span style="color: #F29668">.</span><span style="color: #FFB454">get</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">`pyRange`</span><span style="color: #BFBDB6">)</span><span style="color: #F29668">.</span><span style="color: #FFB454">toJs</span><span style="color: #BFBDB6">() }</span></span>
+<span class="line"><span style="color: #BFBDB6">  }</span></span>
+<span class="line"><span style="color: #BFBDB6">  output</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">innerText </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> JSON</span><span style="color: #F29668">.</span><span style="color: #FFB454">stringify</span><span style="color: #BFBDB6">(</span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">R</span><span style="color: #AAD94C">`sample(pyRange, 5)</span><span style="color: #FF8F40">${</span><span style="color: #BFBDB6">opts</span><span style="color: #FF8F40">}</span><span style="color: #AAD94C">`</span><span style="color: #BFBDB6">)</span></span>
+<span class="line"><span style="color: #BFBDB6">}</span><span style="color: #BFBDB6B3">;</span></span>
+<span class="line"></span></code></pre>
+<p>We are having Pyodide give us a range from <code>1:100</code>, and we want WebR to <code>sample()</code> from it. We need to get those values into WebR, and one good way is to hijack the <code>env</code> slot of <code>REvalOptions</code> and supply it as a named parameter. So, we set up our <code>REvalOptions</code> data structure:</p>
+<pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #FF8F40">const</span><span style="color: #BFBDB6"> opts </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> {</span></span>
+<span class="line"><span style="color: #BFBDB6">  env</span><span style="color: #BFBDB6B3">:</span><span style="color: #BFBDB6"> {</span></span>
+<span class="line"><span style="color: #BFBDB6">    pyRange</span><span style="color: #BFBDB6B3">:</span><span style="color: #BFBDB6"> webPy</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">globals</span><span style="color: #F29668">.</span><span style="color: #FFB454">get</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">`pyRange`</span><span style="color: #BFBDB6">)</span><span style="color: #F29668">.</span><span style="color: #FFB454">toJs</span><span style="color: #BFBDB6">()</span></span>
+<span class="line"><span style="color: #BFBDB6">  }</span></span>
+<span class="line"><span style="color: #BFBDB6">}</span></span>
+<span class="line"></span></code></pre>
+<p>then pass that into <code>R</code> via:</p>
+<pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">R</span><span style="color: #AAD94C">`sample(pyRange, 5)</span><span style="color: #FF8F40">${</span><span style="color: #BFBDB6">opts</span><span style="color: #FF8F40">}</span><span style="color: #AAD94C">`</span></span>
+<span class="line"></span></code></pre>
+<p>That <code>${opts}</code> is then used by <code>evalR()</code> to provide the environment context for the function call.</p>
+<p>We could also have done:</p>
+<pre class="shiki " style="background-color: #0b0e14" tabindex="0"><code><span class="line"><span style="color: #BFBDB6">sample </span><span style="color: #F29668">=</span><span style="color: #BFBDB6"> </span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">R</span><span style="color: #AAD94C">`sample`</span></span>
+<span class="line"><span style="color: #FFB454">simplifyRJs</span><span style="color: #BFBDB6">(</span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> </span><span style="color: #FFB454">sample</span><span style="color: #BFBDB6">(</span><span style="color: #FF8F40">await</span><span style="color: #BFBDB6"> webPy</span><span style="color: #F29668">.</span><span style="color: #BFBDB6">globals</span><span style="color: #F29668">.</span><span style="color: #FFB454">get</span><span style="color: #BFBDB6">(</span><span style="color: #AAD94C">`pyRange`</span><span style="color: #BFBDB6">)</span><span style="color: #F29668">.</span><span style="color: #FFB454">toJs</span><span style="color: #BFBDB6">()</span><span style="color: #BFBDB6B3">,</span><span style="color: #BFBDB6"> </span><span style="color: #D2A6FF">5</span><span style="color: #BFBDB6">))</span></span>
+<span class="line"></span></code></pre>
+<p>Since the <code>R</code> template/tag function is also smart enough to recognize when it got an R <code>function</code> as a return value and just pass that back.</p>
+<p>If you need fancier use of template strings for evaluating R code, then stick with the <code>evalR…()</code> family of functions. But remember you can pass the value of the final <code>toJs()</code> call through <code>simplifyRJs()</code> to get back easier to manage values (that function will become smarter over time).</p>
+<h3>FIN</h3>
+<p><a href="https://github.com/hrbrmstr/webr-pyodide-minimal-plus-markdown">Get it on GitHub</a></p>
 <!-- extra body bits -->
 </body>
 </html>

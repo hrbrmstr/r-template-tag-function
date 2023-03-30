@@ -1,17 +1,15 @@
-import * as R from "./r.js";
+import { webR, R, simplifyRJs } from "./r.js";
 import * as Py from "./py.js"; // uncomment this for pyodide
 
 const statusMessage = document.getElementById("status-message")
 
-statusMessage.innerHTML = `🔵 WebR — <code>${await webR.evalRString("R.version.string")}</code> — Loaded (+ pypdide)!`
+statusMessage.innerHTML = `🔵 WebR — <code>${await R`R.version.string`}</code> — Loaded (+ pypdide)!`
 
 const rButton = document.getElementById("r-button")
 rButton.disabled = false
 rButton.onclick = async () => {
 	const output = document.getElementById("r-output")
-	const res = await webR.evalR("sample(100, 5)")
-	const val = await res.toArray()
-	output.innerText = JSON.stringify(val)
+	output.innerText = JSON.stringify(await R`sample(100, 5)`)
 };
 
 const pyButton = document.getElementById("py-button")
@@ -32,12 +30,18 @@ rpyButton.disabled = false
 rpyButton.onclick = async () => {
 	const output = document.getElementById("rpy-output")
 	await webPy.runPython(`pyRange = list(range(1, 101))`)
-	const val = await webR.evalR(`sample(pyRange, 5)`, {
+	const opts = {
 		env: {
 			pyRange: webPy.globals.get(`pyRange`).toJs()
 		}
-	})
-	output.innerText = JSON.stringify(await val.toArray())
+	}
+	output.innerText = JSON.stringify(await R`sample(pyRange, 5)${opts}`)
+
+	// alternative method to ^^
+	const sample = await R`sample`
+	console.log(
+		simplifyRJs(await sample(await webPy.globals.get(`pyRange`).toJs(), 5))
+	)
 };
 
 
