@@ -1,6 +1,7 @@
 ---
 {
   "title": "🧪 🕸️ An `R` Template 'Tag' Function",
+   "description": "More straightforward way to call R code with some deliberate limitations.",
   "og" : {
     "site_name": "WebR Exeriments",
     "url": "https://rud.is/w/r-template-tag-function",
