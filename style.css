@@ -69,7 +69,7 @@ code {
 	font-size: var(--body-2);
 }
 
-pre {
+pre.shiki {
 	border: 1px solid gray;
 	overflow: autos;
 	overflow-y: scroll;
