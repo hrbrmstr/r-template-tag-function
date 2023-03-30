@@ -2,7 +2,7 @@
 # Good cheatsheet (https://cheatography.com/linux-china/cheat-sheets/justfile/)
 
 # project dir
-project := "webr-pyodide-minimal-plus-markdown"
+project := "r-template-tag-function"
 	
 # where to sync ./build
 syncDest := "rud.is:~/rud.is/w/" + project + "/"

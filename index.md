@@ -1,12 +1,12 @@
 ---
 {
-  "title": "🧪 🕸️ Actual Minimal WebR App Shell With Pyodide",
+  "title": "🧪 🕸️ An `R` Template 'Tag' Function",
   "og" : {
     "site_name": "WebR Exeriments",
-    "url": "https://rud.is/w/webr-pyodide-minimal-plus-markdown",
-    "description": "Select a data file (CSV) and let WebR (& Arquero) 'analyze' it for you!",
+    "url": "https://rud.is/w/r-template-tag-function",
+    "description": "More straightforward way to call R code with some deliberate limitations.",
     "image": {
-      "url": "https://rud.is/w/webr-pyodide-minimal-plus-markdown/preview.png",
+      "url": "https://rud.is/w/r-template-tag-function/preview.png",
       "alt": "example"
     }
   },
@@ -27,7 +27,7 @@
 	]
 }
 ---
-# 🧪 Actual Minimal WebR App Shell With Pyodide</h1>
+# 🧪 An `R` Template "Tag" Function
 
 <div class="widget" id="status-message">Please wait…initializing WebR & Pyodide…</div>
 
