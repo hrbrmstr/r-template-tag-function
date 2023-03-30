@@ -73,7 +73,7 @@ code {
 }
 
 pre.shiki {
-	font-size: calc(var(--body-1) * 10);
+	font-size: 100pt;
 	border: 1px solid gray;
 	overflow-x: auto;
 	overflow-y: scroll;
